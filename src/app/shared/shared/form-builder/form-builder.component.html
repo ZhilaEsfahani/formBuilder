@@ -1,0 +1,190 @@
+<div class="container py-5" >
+  <h3 class="my-2" *ngIf="infoFlag"> مشخصات فرم مورد نظر را وارد کنید </h3>
+  <h3 class="my-2" *ngIf="!infoFlag"> فرم مورد نظر ساخته شد </h3>
+  <form class="example-form" [formGroup]="userForm" *ngIf="infoFlag">
+      <div class="address-container" 
+        *ngFor="let group of createdForm.controls; let i = index;"
+         formArrayName="myForm">
+        <div class="form-group jumbotron" [formGroupName]='i'>
+          <p>{{i+1}}-</p>
+          <div class="mb-3">
+            <input class="form-control" placeholder="عنوان فیلد مورد نظر" value="" type="text" formControlName="field_name">
+            <div *ngIf="controls.field_name.errors?.required">
+              <span class="error-text">وارد کردن عنوان فیلد الزامی است</span>
+            </div>             
+          </div>
+
+          <div class="mb-3">
+            <input class="form-control" placeholder="عنوان نمایشی" value="" type="text" formControlName="field_show">
+            <div *ngIf="controls.field_show.errors?.required">
+              <span class="error-text">وارد کردن عنوان نمایشی الزامی است</span>
+            </div>             
+          </div>
+          
+          <div class="mb-3">
+            <select 
+              class="form-select"
+              formControlName="type">
+              <option value="null" hidden> انتخاب کنید </option>
+              <option value="number"> عددی </option>
+              <option value="text"> رشته ای  </option>
+              <option value="textarea"> توضیحات متنی  </option>
+              <option value="date"> تاریخ </option>
+              <option value="select"> انتخاب از لیست  </option>
+              <option value="radio"> رادیویی </option>
+              <option value="checkbox"> چک باکس </option>
+            </select>
+            <div *ngIf="controls.type.errors?.required">
+              <span class="error-text"> انتخاب نوع فیلد الزامی است</span>
+            </div>
+          </div>
+          <div *ngIf="createdForm.value[i].type === 'checkbox' || createdForm.value[i].type === 'radio' || createdForm.value[i].type === 'select'">
+            <input class="form-control mb-3" placeholder=" متن گزینه "
+               type="text"  formControlName="option">
+            <button type="button" class="btn btn-light mb-3" (click)="addOption(i)">
+              افزودن گزینه +
+            </button>
+            <div *ngFor="let option of preOption;let i = index;">
+              <span class="mb-3">{{i+1}}-{{option}}</span>
+            </div>
+          </div>
+            
+          <!-- <input class="form-control mb-3" placeholder="فرمت مورد نظر" type="text" formControlName="format"> -->
+          <textarea class="form-control mb-3" placeholder="توضیحات" value="" type="text" formControlName="description"></textarea>
+
+          <div class="mb-3" *ngIf="createdForm.value[i].type === 'text' ">
+            <h5> فرمت مورد نظر:  </h5>
+            <input type="radio" [value] = "'email'" id="email"  value="true" formControlName="format">
+            <label for="email"> ایمیل </label><br>
+            <input type="radio" [value] = "'number'" id="number"  value="true" formControlName="format">
+            <label for="number"> شماره همراه </label><br>
+          </div>
+          <div *ngIf="createdForm.value[i].type === 'number' 
+          || createdForm.value[i].type === 'text'
+          || createdForm.value[i].type === 'textarea'
+          || createdForm.value[i].type === 'date'
+          || createdForm.value[i].type === 'select'">
+            <input type="checkbox" id="required"  value="true" formControlName="require">
+            <label for="required"> الزامی بودن  </label><br>
+          </div>
+          <div class="form-row org-desc-parent-margin d-flex justify-content-evenly align-items-center m-4">
+            <button *ngIf="i>0" class="btn btn-danger float-end" (click)="removeField(i)">پاک کردن فیلد</button>
+            <button class="btn  btn-outline-primary" (click)="addField(i)" *ngIf="infoFlag"> افزودن فیلد + </button>
+          </div>
+          
+        </div>
+      </div>
+      
+  </form>
+
+  
+  <form class="example-form" [formGroup]="finalForm" *ngIf="!infoFlag">
+    <div class="address-container" 
+      *ngFor="let field of iterateArr; let i = index;"
+      formArrayName="final" 
+    >
+      <!-- inputs type text,date and number -->
+      <label class="col-12 mb-3 p-2" 
+        *ngIf="field[1][1] === 'text' || field[1][1] ==='number' || field[1][1] ==='date'">
+        <div class="p-0 d-flex justify-content-start align-items-center">
+          <span class="d-flex justify-content-start align-items-center col-md-2">{{i+1}}-{{field[1][2]}}:</span>
+          <input class="form-control"
+            [type]="field[1][1]" 
+            [formControlName]="i"
+            placeholder="{{field[1][4]}}">
+        </div>
+
+        <div class="col-12" *ngIf="finalcontrols[i].invalid">
+            <div *ngIf="$any(finalcontrols[i]).errors.required">
+              <span class="error-text">
+                این فیلد الزامی است
+              </span>
+            </div>
+            <div *ngIf="$any(finalcontrols[i]).errors.pattern">
+              <span class="error-text" *ngIf="field[1][4] === 'email'">
+                فرمت ایمیل باید مانند example@example.exe  باشد
+              </span>
+              <span class="error-text" *ngIf="field[1][4] === 'number'">
+                فرمت شماره همراه باید مانند +98912999999  باشد
+              </span>
+            </div>
+        </div>
+      </label>
+      <!-- inputs type select -->    
+      <label class="col-12 mb-3 p-2" *ngIf="field[1][1] === 'select' "> 
+        <div class="p-0 d-flex justify-content-start align-items-center">
+          <span class="d-flex justify-content-start align-items-center col-md-2">{{i+1}}-{{field[1][2]}}:</span>   
+          <select 
+            class="form-select"
+            [formControlName]="i">
+            <option [value]="" hidden> انتخاب کنید </option>
+            <option class="col-12" *ngFor="let item of field[1][5][0]" [value]="item"> {{item}}</option>
+          </select>
+        </div>
+        <div class="col-12" *ngIf="finalcontrols[i].invalid">
+          <div *ngIf="$any(finalcontrols[i]).errors.required">
+            <span class="error-text">
+              این فیلد الزامی است
+            </span>
+          </div>
+        </div>
+      </label>  
+      <!-- inputs type radio and checkbox -->
+      <div *ngFor="let item of field[1][5][0]">
+        <label for="checkbox"
+          class="mb-3 p-2 d-flex justify-content-start align-items-start col-12"
+          *ngIf="field[1][1] === 'radio' || field[1][1] ==='checkbox'"> 
+          {{i+1}}-
+            <input class="form-check "
+            [name]="i"
+            [value] ="item"
+            [type]="field[1][1]"
+            [formControlName]="i">
+            {{item}}          
+            <div class="col-12" *ngIf="finalcontrols[i].invalid">
+              <div *ngIf="$any(finalcontrols[i]).errors.required">
+                <span class="error-text">
+                  این فیلد الزامی است
+                </span>
+              </div>
+            </div>
+        </label>
+      </div>
+      <!-- textarea -->
+      <label class="col-12 mb-3 p-2" *ngIf="field[1][1] === 'textarea'">
+        <div class="p-0">
+          <span class="d-flex justify-content-start align-items-center col-md-2"> {{i+1}}-{{field[1][2]}}: </span>
+          <textarea class="form-control"
+            placeholder="توضیحات فیلد مورد نظر" 
+            value=""
+            [formControlName]="i">
+          </textarea>
+        </div>
+        
+        <div class="d-flex justify-content-start align-items-start col-12" *ngIf="finalcontrols[i].invalid">
+          <div *ngIf="$any(finalcontrols[i]).errors.required">
+            <span class="error-text">
+              این فیلد الزامی است
+            </span>
+          </div>
+        </div>
+      </label>
+    </div>
+  </form>
+  
+  
+  <div class="alert alert-danger" role="alert" *ngIf="errorFlag">
+    لطفا فیلدها را طبق فرمت ذکر شده پر کنید!
+  </div>
+    
+  <button class="btn btn-primary" (click)="createForm()" *ngIf="infoFlag"> ایجاد فرم </button>
+  <button class="btn btn-primary" (click)="getInfo()" *ngIf="!infoFlag"> دیدن اطلاعات فرم </button>
+
+</div>
+
+<div  class="container py-5" *ngIf="finalFormInfoLenghth !== 0">
+  <div *ngFor="let field of finalFormInfo;let i = index;"
+    class="bg-light p-2">
+    <span>{{i+1}} - {{field}}</span>
+  </div>
+</div>
