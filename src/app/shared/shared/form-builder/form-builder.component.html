@@ -169,6 +169,7 @@
           </div>
         </div>
       </label>
+      <p class="p-3 mb-2 bg-light text-dark"> {{field[1][6]}} </p>
     </div>
   </form>
   
@@ -184,7 +185,7 @@
 
 <div  class="container py-5" *ngIf="finalFormInfoLenghth !== 0">
   <div *ngFor="let field of finalFormInfo;let i = index;"
-    class="bg-light p-2">
-    <span>{{i+1}} - {{field}}</span>
+    class="bg-secondary p-2">
+    <span class="text-white">{{i+1}} - {{field}}</span>
   </div>
 </div>

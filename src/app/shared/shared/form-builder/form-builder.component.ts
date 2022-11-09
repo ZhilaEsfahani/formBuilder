@@ -86,7 +86,8 @@ export class FormBuilderComponent implements OnInit {
       this.createdForm.value[i].field_show,
       this.createdForm.value[i].field_name,
       this.createdForm.value[i].format,
-      this.createdForm.value[i].optionArr]   
+      this.createdForm.value[i].optionArr,
+      this.createdForm.value[i].description]   
       formArray.insert(formArray.length, this._fb.control(``));
       if(this.createdForm.value[i].require){
         this.finalFormUser.controls[i].setValidators([Validators.required]);   
